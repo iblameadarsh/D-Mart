@@ -1,0 +1,46 @@
+{% extends "BuyNow/base.html" %}
+{%block content%}
+<article class="media content-section">
+    <div class="media-body">
+        <small class="text-muted" style="text-transform: capitalize;">Category: {{Product.category}}</small>
+        <h2><a class="article-title" href="#">{{Product.name}}</a></h2>
+        <p class="article-content">{{Product.description}}</p>
+        <div class="ImageCss">
+            <img class="Product_image" style=" height: 262px;
+                        width: 300px;
+                        margin-left: 50%;
+                        margin-right: 20%;
+                        margin-bottom: 16px;" src={{Product.image.url}}
+            >
+        </div>
+        <div style= "display: flexbox ;justify-content: space-between; padding-top: 5px;">
+            <a class="mr-2" href="#" style="padding-right: 60%;">Price: ₹ {{Product.price}}</a>
+            <button class="button" type="submit" style="text-decoration: none">Buy Now</button>
+        </div>
+        <div style="padding-left: 78%;">
+            <a class="button1" href="{%url 'update' Product.id%}">Edit</a>
+        </div>
+        <div style="padding-left: 78%;">
+            <a class="button1" href="{%url 'delete' Product.id%}">Delete</a>
+        </div>
+    </div>
+    <br>
+    <br>objects.all
+        <!-- <div><p>hello{{comm.Comments.comment}}</p></div> -->
+        
+
+    </article>
+<!--{% for comments in product.Comments %}-->
+<!--<div>-->
+<!--    <article class="media content-section">-->
+<!--        <div class="media-body">-->
+<!--            <h4><a class="article-title" target="_blank" href="{% url 'List' product.id%}">{{comments.user}}</a></h4>-->
+<!--            <p class="article-content">{{comments.comment}}</p>-->
+<!--            <div class="ImageCss">-->
+<!--                <img class="Product_image"  src={{prod.image.url}}>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </article>-->
+<!--</div>-->
+<!-- {% endfor %}-->
+{% endblock %} 

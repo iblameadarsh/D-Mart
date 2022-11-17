@@ -1,0 +1,17 @@
+{% extends "BuyNow/base.html" %}
+{% load crispy_forms_tags %}
+{%block content%}
+<h2>Login</h2>
+    <form method="POST">
+        {%csrf_token%}
+        <fieldset class="form-group">
+            {{form|crispy}}
+        </fieldset>
+        <div class="form-group">
+            <input class="btn btn-outline-info" type="submit" value="Login">
+        </div>
+    </form>
+    <div><small > Dont have an account?</small>
+        <a style="text-decoration:none;" href="{%url 'register'%} "> Register here!</a>
+    </div>
+{% endblock %}

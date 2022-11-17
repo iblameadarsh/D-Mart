@@ -1,0 +1,35 @@
+{% extends "BuyNow/base.html" %}
+{%block content%}
+    {% for product in Product %}
+    <div>
+    <article class="media content-section">
+        <div class="media-body">
+          <div class="article-metadata">
+            <small class="text-muted" style="text-transform: capitalize;">Category: {{product.category}}</small>
+          </div>
+          <h2><a class="article-title" target="_blank" href="{% url 'List' product.id%}">{{product.name}}</a></h2>
+          <p class="article-content">{{product.description}}</p>
+          <div class="ImageCss">
+            <img class="Product_image" style=" height: 262px;
+            width: 300px;
+            margin-left: 50%;
+            margin-right: 20%;
+            margin-bottom: 16px;" src={{product.image.url}}
+            >
+          </div>
+          <div style= "display: flexbox ;justify-content: space-between; padding-top: 5px;">
+            <a class="mr-2" href="#" style="padding-right: 60%;">Price: ₹ {{product.price}}</a>
+            <button class="button"  type="submit">
+              <a target="blank" href="{% url 'List' product.id%}" style="text-decoration: none">Buy Now</a>
+            </button>
+          </div>
+        </div>
+    </article>
+    </div>
+    {% endfor %}
+
+        <!-- <h2>{{product.name}}</h1>
+        <p>₹ {{product.price}}</p>
+        <p>{{product.description}}</p>
+        <p>Category: {{product.category}}</p>         -->
+{% endblock %}

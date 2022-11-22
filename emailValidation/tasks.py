@@ -4,7 +4,7 @@ from celery import shared_task
 @shared_task
 def evalidationHandler(task_export_id, emails_file_path):
     from emailValidation.models import ValidEmailExport
-    from emailValidation.supplier_email_verify import export_runner
+    from emailValidation.EmailValidator import export_runner
     from django.core.mail import send_mail
     from D_Mart.settings import EMAIL_HOST_USER
 

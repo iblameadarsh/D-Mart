@@ -3,9 +3,12 @@ from .models import *
 
 # Register your models here.
 
-admin.site.register(ValidEmailExport)
+
+class ValidEmailExportAdmin(admin.ModelAdmin):
+    list_display = ('id', 'task_name', 'user', 'status', 'created_at')
+    list_filter = ("status", "created_at", "user")
 
 
-class EmailExportAdmin(admin.ModelAdmin):
-    list_display = ('id', 'task_name', 'user', 'created_at', 'status')
-    list_filter = ("user", "status", "created_at")
+admin.site.register(ValidEmailExport, ValidEmailExportAdmin)
+
+

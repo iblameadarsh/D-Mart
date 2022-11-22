@@ -29,11 +29,12 @@ from emailValidation import eurls
 urlpatterns = [
     path('', include(urls)),
     path('', include(Commurls)),
-    path('', include(eurls)),
+    path('tools/', include(eurls)),
     path('admin/', admin.site.urls),
     path('login/', WeLogin.as_view(), name='login'),
     path('log-out', LogoutView.as_view(next_page='login'), name='logout'),
     path('Sign-up/', Signup.as_view(), name='register'),
+
 ]
 
 if settings.DEBUG:

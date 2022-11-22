@@ -51,7 +51,7 @@ class ProUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         False
 
 
-class DeletePro(LoginRequiredMixin, DeleteView):
+class DeletePro(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     queryset = Product.objects.all()
     template_name = 'BuyNow/Product_confirm_delete.html'
     fields = ['name', 'description', 'price', 'image', 'category']

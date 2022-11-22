@@ -2,14 +2,10 @@
 {% load crispy_forms_tags %}
 {%block content%}
 
-    <form method="POST" action="{% url 'form-submit' %}" enctype="multipart/form-data" >
-        {%csrf_token%}
-
-        {{ form|crispy }}
-
-        <p> Please upload a file to process.</p>
-        <input class="btn btn-outline-info" type="submit" value="Upload"/>
-
+    <form action="" method="POST" style=" " enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form|crispy }}
+              <input type="submit" value="CREATE" class="btn btn-info"/>
     </form>
     <br>
     <br>

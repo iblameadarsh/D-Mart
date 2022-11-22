@@ -1,9 +1,14 @@
 from django import forms
-from.models import EmailValidations
+from .models import ValidEmailExport
 
 
-class ProjectForm(forms.ModelForm):
-    model = EmailValidations
-
+class EmailExportModelform(forms.ModelForm):
     class Meta:
-        fields = ['taskName', 'rcpt_email', 'input_file']
+        model = ValidEmailExport
+        fields = [
+            'task_name',
+            'supplier_emails_file',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(EmailExportModelform, self).__init__(*args, **kwargs)

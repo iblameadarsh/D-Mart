@@ -1,19 +1,20 @@
-import socket, smtplib, re, dns.resolver
+import socket, smtplib, re, dns.resolver, requests
 import pandas as pd
 from verify_email import verify_email  # third party verification library
 import time
-from .models import EmailValidations
-from django.contrib.auth.models import User
+from D_Mart.db_connect import DATABASE as MONGO_DATABASE
 
 
 class EmailProcess:
 
-    def __init__(self, email=None, supplier_id=None, supplier_name=None, status_type=None):
+    def __init__(self, email=None, status_type=None, task_export_id=None,
+                 code=None):
         self.addressToVerify = email
         print("Checking...", email)
-        self.supplier_id = supplier_id
-        self.supplier_name = supplier_name
+
         self.status_type = status_type
+        self.task_export_id = task_export_id
+        self.code = code
 
     def checkEmail(self):
         try:
@@ -22,13 +23,12 @@ class EmailProcess:
             if match is None:
                 # return False
                 return {
-                    'id': self.supplier_id,
-                    'name': self.supplier_name,
+                    'task id': self.task_export_id,
                     'email': self.addressToVerify,
                     "type": "",
                     "status": "false",
                     "message": "match is None",
-                    "code": ""
+                    "code": "",
                 }
             else:
                 domain_name = self.addressToVerify.split('@')[1]
@@ -49,19 +49,17 @@ class EmailProcess:
                     print("A1")
                     # return False
                     return {
-                        'id': self.supplier_id,
-                        'name': self.supplier_name,
+                        'task id': self.task_export_id,
                         'email': self.addressToVerify,
                         "type": "red",
                         "status": "false",
                         "message": message.decode('utf-8'),
-                        "code": str(code)
+                        "code": str(code),
                     }
                 else:
                     if code == 250:
                         return {
-                            'id': self.supplier_id,
-                            'name': self.supplier_name,
+                            'task id': self.task_export_id,
                             'email': self.addressToVerify,
                             "type": "green",
                             "status": "true",
@@ -73,8 +71,7 @@ class EmailProcess:
                         print("A2")
                         # return False
                         return {
-                            'id': self.supplier_id,
-                            'name': self.supplier_name,
+                            'task id': self.task_export_id,
                             'email': self.addressToVerify,
                             "type": "yellow",
                             "status": "false",
@@ -85,8 +82,7 @@ class EmailProcess:
             print("A3")
             # return False
             return {
-                'id': self.supplier_id,
-                'name': self.supplier_name,
+                'task id': self.task_export_id,
                 'email': self.addressToVerify,
                 "type": "orange",
                 "status": "false",
@@ -96,7 +92,7 @@ class EmailProcess:
 
     def third_party_verification(self):
         status_type = self.status_type
-        timeout = time.time() + 60 * 5  # 5 minutes from now
+        timeout = time.time() + 60 * 2  # 5 minutes from now
         if status_type != 'green':
             email = row['email']
             # print("email ::", email)
@@ -111,26 +107,67 @@ class EmailProcess:
 
         return row
 
+    def final_result(self):
 
-if __name__ == '__main__':
-    model = EmailValidations
+        status_type = self.status_type
+        code = row['code']
+        prefix = "http://"
+        email = row['email']
+        url = prefix + email.split('@')[1]
+        print('checking url: ', url)
+        row.update({'Http status code': ''})
+
+        if status_type == 'green' and code == '250':
+            row.update({'final status': 'verified'})
+            # row.update({'domain_active': ''})
+
+        elif status_type == 'red' and code == '250':
+            row.update({'final status': 'extrapolated'})
+
+            try:
+                res = requests.get(url, timeout=10.0)
+                result = res.status_code
+                print(result)
+                row.update({'Http status code': result})
+
+                if str(result) == '200':
+                    row.update({'domain_active': 'True'})
+                elif str(result) == '':
+                    row.update({'domain_active': 'False'})
+                else:
+                    row.update({'domain_active': 'False'})
+
+            except requests.Timeout as err:
+                print(err.strerror)
+            except requests.RequestException as errs:
+                print(errs.errno)
+
+        else:
+            row.update({'final status': 'not verified'})
+            # row.update({'domain_active': ''})
+
+        return row
+
+
+def export_runner(task_export_id, email_file_path):
     final_list = []
+    db_obj = MONGO_DATABASE()
 
-    csv_file_path = f"/home/adarsh/D_Mart/media/files/{EmailValidations.input_file}.csv"
-    df = pd.read_csv(csv_file_path)
-
+    global row
+    df = pd.read_csv(email_file_path)
+    df = df.dropna(how='any', subset=['email'], axis=0)
     for ins, i in df.iterrows():
         row = dict(i)
 
-        # supplier_id = row['id']
-        # print("supplier_id ::", supplier_id)
-        # supplier_name = row['name']
-        # print("supplier_name ::", supplier_name)
-        supplier_email = row['email']
+        email = row['email']
         # print("email ::", supplier_email)
         # print("*"*50)
 
-        EmailProcess_obj = EmailProcess(supplier_id=None, supplier_name=None, email=supplier_email)
+        EmailProcess_obj = EmailProcess(
+
+            email=email,
+            task_export_id=task_export_id
+        )
         result = EmailProcess_obj.checkEmail()
         final_list.append(result)
 
@@ -140,19 +177,39 @@ if __name__ == '__main__':
 
     final_list_third_party = []
     for ins, i in fdf.iterrows():
-
         row = dict(i)
         status_type = row['type']
         # print("status_type ::", status_type)
         email = row['email']
-        EmailProcess_obj = EmailProcess(supplier_id=None, supplier_name=None, email=email, status_type=status_type)
+        EmailProcess_obj = EmailProcess(
+
+            email=email,
+            status_type=status_type,
+            task_export_id=task_export_id
+        )
+
         third_party_obj = EmailProcess_obj.third_party_verification()
         final_list_third_party.append(third_party_obj)
 
-    print("final_list_third_party : ", final_list_third_party)
+    final_verified_list = []
+    ndf = pd.DataFrame(final_list_third_party)
 
-    new_df = pd.DataFrame(final_list_third_party)
-    new_df.to_csv(f"OutputFile-{EmailValidations.taskName}.csv")
+    for ins, i in ndf.iterrows():
+        row = dict(i)
+        status_type = row['type']
+        code = row['code']
+        EmailProcess_obj = EmailProcess(
+
+            email=email,
+            status_type=status_type,
+            task_export_id=task_export_id,
+            code=code
+        )
+        final_result_obj = EmailProcess_obj.final_result()
+        final_verified_list.append(final_result_obj)
+        db_obj.email_validation_exports.insert_one(final_result_obj)
+
+    print("final_list_result : ", final_verified_list)
+    db_obj.client.close()
+
     print("File generated done .. !")
-
-

@@ -160,7 +160,6 @@ def export_runner(task_export_id, email_file_path):
         row = dict(i)
 
         email = row['email']
-        # print("email ::", supplier_email)
         # print("*"*50)
 
         EmailProcess_obj = EmailProcess(

@@ -10,7 +10,7 @@ model = Product
 
 
 class Read(ListView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.order_by('id')
     template_name = 'BuyNow/BuyNow.html'
     context_object_name = 'Product'
 

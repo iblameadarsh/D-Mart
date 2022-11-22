@@ -54,7 +54,7 @@ class ValidEmailExport(models.Model):
         input_file_check = True
 
         error_items = []
-        columns_required = ['supplier_id', 'supplier name', 'email']
+        columns_required = ['email']
         # columns_required = ['email']
 
         if str(self.supplier_emails_file).strip() == '':

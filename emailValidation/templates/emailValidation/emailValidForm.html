@@ -2,6 +2,14 @@
 {% load crispy_forms_tags %}
 {%block content%}
 
+<div>
+                <p style="text-align:right">
+                    <a href="{% url 'emailValidation:export_email_template' %}" target="_blank">
+                    Click here
+                    </a>
+                    to download template.
+                </p>
+</div>
     <form action="" method="POST" style=" " enctype="multipart/form-data">
               {% csrf_token %}
               {{ form|crispy }}

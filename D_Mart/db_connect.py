@@ -7,10 +7,10 @@ class DATABASE:
     def __init__(self):
         self.client = MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
 
-        # Mongo Database for govshop GUI Executions Data Exports
+        # Mongo Database for GUI Executions Data Exports
         db_gui = self.client.d_mart_emails
 
-        # Collection for Supplier Email Validation Exports
+        # Collection for Email Validation Exports
         EXPORT_EMAIL_VALIDATIONS_INDEX = [("task_id", 1), ]
         self.email_validation_exports = db_gui.email_validation_exports
         self.email_validation_exports.create_index(EXPORT_EMAIL_VALIDATIONS_INDEX)

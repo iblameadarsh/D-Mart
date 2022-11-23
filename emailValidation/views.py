@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from D_Mart.db_connect import DATABASE as MONGO_DATABASE
 from datetime import *
+from Users.models import ActivityLogs
 
 
 class EmailValidationView(LoginRequiredMixin, FormView):
@@ -53,6 +54,11 @@ class EmailFinalExport(View):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={}'.format(file_name)
         fdf.to_csv(path_or_buf=response, index=False)
+        logobj = ActivityLogs()
+        logobj.log_type = 'file_export'
+        logobj.description = "File: {} Exported From Email Validations Export Feature".format(file_name)
+        logobj.user = request.user
+        logobj.save()
         return response
 
 
@@ -64,6 +70,11 @@ def download_template(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={}'.format(file_name)
         df.to_csv(path_or_buf=response, index=False, encoding='utf-8')
+        logobj = ActivityLogs()
+        logobj.log_type = 'file_export'
+        logobj.description = "File: {} Exported From Email Validations Export Feature".format(file_name)
+        logobj.user = request.user
+        logobj.save()
         return response
 
 

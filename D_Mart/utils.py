@@ -2,6 +2,7 @@ import os
 import random
 import string
 import uuid
+from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
 
@@ -23,9 +24,21 @@ def import_file_path(instance, filename):
 
 # MODEL_UTILS
 
+CAT_CHOICES = [
+        ('groceries', _('Groceries')),
+        ('electronics', _('Electronics')),
+        ('clothing', _('Clothing')),
+        ('toys', _('Toys')),
+        ('beverages', _('Beverages')),
+        ('grooming', _('Grooming')),
+        ('others', _('Others')),
+        ('shoes', _('Shoes')),
+    ]
+
 TASK_STATUS_CHOICES = (
     ("pending", 'pending'),
     ("running", 'running'),
     ("terminated", 'terminated'),
     ("completed", 'completed'),
 )
+
